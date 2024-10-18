@@ -2,9 +2,18 @@ from .ast import Node
 import re
 
 def create_rule(rule_string):
-    # Parse the rule string to build an AST
-    tokens = re.findall(r'\(|\)|\w+|[<>=!]+|AND|OR', rule_string)
+    # This function should parse the rule_string into an AST, considering parentheses
+    rule_string = rule_string.strip()
+    
+    # Tokenize the rule string
+    tokens = tokenize(rule_string)
+    
+    # Build and return the AST
     return build_ast(tokens)
+
+def tokenize(rule_string):
+    # Tokenize the rule string into manageable pieces
+    return re.findall(r'\(|\)|\w+|[<>=!]+|AND|OR', rule_string)
 
 def build_ast(tokens):
     stack = []
@@ -34,7 +43,7 @@ def build_ast(tokens):
             match = re.match(r"(\w+)\s*([<>=!]+)\s*(\d+|'[a-zA-Z]+')", token)
             if match:
                 operand, operator, value = match.groups()
-                node = Node('operand', value=value)
+                node = Node('operand', value=f"{operand} {operator} {value}")
                 stack.append(node)
             else:
                 raise ValueError(f"Invalid token: {token}")
@@ -52,8 +61,11 @@ def combine_rules(rules):
     combined = Node('operator', None, None, 'OR')  # Combine rules with OR for simplicity
     for rule in rules:
         rule_node = create_rule(rule)
-        combined.left = combined.right
-        combined.right = rule_node
+        if combined.left is None:
+            combined.left = rule_node  # Set the first rule as the left node
+        else:
+            combined.right = rule_node  # Set the subsequent rules as right nodes
+            combined = Node('operator', combined, rule_node, 'OR')  # Create a new combined node
     return combined
 
 def evaluate_rule(rule_node, data):
@@ -63,11 +75,26 @@ def evaluate_rule(rule_node, data):
         left_result = evaluate_rule(rule_node.left, data)
         right_result = evaluate_rule(rule_node.right, data)
         return evaluate_operator(left_result, right_result, rule_node.value)
-    
+
 def evaluate_operand(operand_value, data):
-    # Parse the operand and evaluate based on the data
-    # This will need further implementation
-    pass
+    # Split the operand value into variable, operator, and comparison value
+    variable, operator, value = operand_value.split()
+    value = int(value.strip("'")) if value.isdigit() else value.strip("'")  # Convert to appropriate type
+
+    # Evaluate based on the comparison operator
+    if operator == '>':
+        return data[variable] > value
+    elif operator == '<':
+        return data[variable] < value
+    elif operator == '=':
+        return data[variable] == value
+    elif operator == '>=':
+        return data[variable] >= value
+    elif operator == '<=':
+        return data[variable] <= value
+    elif operator == '!=':
+        return data[variable] != value
+    return False
 
 def evaluate_operator(left_result, right_result, operator):
     if operator == 'AND':
