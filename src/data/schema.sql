@@ -1,5 +1,0 @@
-CREATE TABLE rules (
-    id SERIAL PRIMARY KEY,
-    rule_string TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
