@@ -1,0 +1,6 @@
+{
+    "rules": [
+        "((age > 30 AND department = 'Sales') OR (age < 25 AND department = 'Marketing'))",
+        "((age > 30 AND department = 'Marketing'))"
+    ]
+}
