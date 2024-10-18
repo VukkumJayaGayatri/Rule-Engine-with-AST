@@ -1,0 +1,125 @@
+from docx import Document
+
+# Create a new Document
+doc = Document()
+
+# Title
+doc.add_heading('API Design for Rule Engine', level=1)
+
+# Overview
+doc.add_heading('Overview', level=2)
+doc.add_paragraph(
+    "This document outlines the API design for the Rule Engine application, which allows users "
+    "to create, combine, and evaluate rules based on user attributes."
+)
+
+# Base URL
+doc.add_heading('Base URL', level=2)
+doc.add_paragraph(
+    "The base URL for the API is `http://<your-server-address>/api`."
+)
+
+# Endpoints
+doc.add_heading('Endpoints', level=2)
+
+# Create Rule
+doc.add_heading('1. Create Rule', level=3)
+doc.add_paragraph('- **Endpoint:** `/create_rule`')
+doc.add_paragraph('- **Method:** `POST`')
+doc.add_paragraph('- **Description:** Creates a new rule based on a rule string and returns its Abstract Syntax Tree (AST) representation.')
+
+# Request
+doc.add_heading('Request', level=4)
+doc.add_heading('Headers:', level=5)
+doc.add_paragraph('- `Content-Type: application/json`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "rule_string": "<rule>"\n}\n```')
+doc.add_heading('Example:', level=5)
+doc.add_paragraph('```json\n{\n    "rule_string": "((age > 30 AND department = \'Sales\') OR (age < 25 AND department = \'Marketing\')) AND (salary > 50000 OR experience > 5)"\n}\n```')
+
+# Response
+doc.add_heading('Response', level=4)
+doc.add_paragraph('- **Status Code:** `200 OK`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "node": {\n        "type": "operator",\n        "value": "AND",\n        "left": { ... },\n        "right": { ... }\n    }\n}\n```')
+doc.add_heading('Error Response:', level=4)
+doc.add_paragraph('- **Status Code:** `400 Bad Request`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "error": "Invalid rule string format."\n}\n```')
+
+# Combine Rules
+doc.add_heading('2. Combine Rules', level=3)
+doc.add_paragraph('- **Endpoint:** `/combine_rules`')
+doc.add_paragraph('- **Method:** `POST`')
+doc.add_paragraph('- **Description:** Combines multiple rule strings into a single AST.')
+doc.add_heading('Request', level=4)
+doc.add_heading('Headers:', level=5)
+doc.add_paragraph('- `Content-Type: application/json`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "rules": [\n        "<rule1>",\n        "<rule2>"\n    ]\n}\n```')
+doc.add_heading('Example:', level=5)
+doc.add_paragraph('```json\n{\n    "rules": [\n        "((age > 30 AND department = \'Sales\')) AND (salary > 20000 OR experience > 5)",\n        "((age < 25 AND department = \'Marketing\'))"\n    ]\n}\n```')
+doc.add_heading('Response', level=4)
+doc.add_paragraph('- **Status Code:** `200 OK`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "node": {\n        "type": "operator",\n        "value": "AND",\n        "left": { ... },\n        "right": { ... }\n    }\n}\n```')
+doc.add_heading('Error Response:', level=4)
+doc.add_paragraph('- **Status Code:** `400 Bad Request`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "error": "One or more rules are invalid."\n}\n```')
+
+# Evaluate Rule
+doc.add_heading('3. Evaluate Rule', level=3)
+doc.add_paragraph('- **Endpoint:** `/evaluate_rule`')
+doc.add_paragraph('- **Method:** `POST`')
+doc.add_paragraph('- **Description:** Evaluates the combined AST against user attributes to determine eligibility.')
+doc.add_heading('Request', level=4)
+doc.add_heading('Headers:', level=5)
+doc.add_paragraph('- `Content-Type: application/json`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "ast": { ... },  // The AST node structure returned from combine_rules\n    "data": {\n        "age": 35,\n        "department": "Sales",\n        "salary": 60000,\n        "experience": 3\n    }\n}\n```')
+doc.add_heading('Response', level=4)
+doc.add_paragraph('- **Status Code:** `200 OK`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "is_eligible": true\n}\n```')
+doc.add_heading('Error Response:', level=4)
+doc.add_paragraph('- **Status Code:** `400 Bad Request`')
+doc.add_heading('Body:', level=5)
+doc.add_paragraph('```json\n{\n    "error": "Invalid data format."\n}\n```')
+
+# Error Handling
+doc.add_heading('Error Handling', level=2)
+doc.add_paragraph(
+    "All endpoints will return appropriate HTTP status codes and error messages for invalid inputs. "
+    "The following status codes may be used:\n"
+    "- `200 OK` for successful requests\n"
+    "- `400 Bad Request` for invalid inputs\n"
+    "- `500 Internal Server Error` for unexpected errors"
+)
+
+# Authentication
+doc.add_heading('Authentication', level=2)
+doc.add_paragraph(
+    "No authentication is required for accessing the API endpoints at this stage."
+)
+
+# Example Scenarios
+doc.add_heading('Example Scenarios', level=2)
+doc.add_paragraph(
+    "1. Creating a rule with valid syntax should return the corresponding AST structure.\n"
+    "2. Combining multiple valid rules should yield a combined AST.\n"
+    "3. Evaluating a rule with provided user data should return the eligibility status."
+)
+
+# Conclusion
+doc.add_heading('Conclusion', level=2)
+doc.add_paragraph(
+    "This API design document serves as a guideline for interacting with the Rule Engine application. "
+    "It outlines the required endpoints, request/response formats, and error handling mechanisms for effective integration and usage."
+)
+
+# Save the document
+file_path = "/mnt/data/api_design_rule_engine.docx"
+doc.save(file_path)
+
+file_path
